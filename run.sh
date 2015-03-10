@@ -30,7 +30,7 @@ fi
 
 echo "=> Run the clean script every ${CLEAN_PERIOD} seconds and delay ${DELAY_TIME} seconds to clean."
 
-trap '{ echo "User Interupt."; exit 1; }' INT
+trap '{ echo "User Interupt."; exit 1; }' SIGINT
 while [ 1 ]
 do
     # Get all image ID
@@ -68,7 +68,7 @@ do
 
     # Wait and remove images being used by containers from the delete list again. This prevents the images being pulled from deleting
     echo "=> About to clean images after ${DELAY_TIME} seconds"
-    sleep ${DELAY_TIME}
+    sleep ${DELAY_TIME} & wait
     CONTAINER_ID_LIST=$(docker ps -aq --no-trunc)
     rm -f ContainerImageIdList
     touch ContainerImageIdList
@@ -99,5 +99,5 @@ do
 
     rm -f ToBeCleanedImageIdList ContainerImageIdList ToBeCleaned ImageIdList KeepImageIdList
     echo "=> Next clean will be started in ${CLEAN_PERIOD} seconds"
-    sleep ${CLEAN_PERIOD}
+    sleep ${CLEAN_PERIOD} & wait
 done
