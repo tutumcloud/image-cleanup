@@ -25,3 +25,5 @@ IMAGE_CLEAN_INTERVAL | (optional) How long to wait between cleanup runs (in seco
 IMAGE_CLEAN_DELAYED | (optional) How long to wait to consider an image unused (in seconds), 1800 by default.
 IMAGE_LOCKED | (optional) A list of images that will not be cleaned by this container, separated by `,`
 
+Note: IMAGE_LOCKED envvar can be specified with `image:tag` or `repository`, e.g."IMAGE_LOCKED=weave, ubuntu:trusty"
+

@@ -85,12 +85,25 @@ func cleanImages(client *docker.Client) {
 		// Get all the locked image ID
 		if *pImageLocked != "" {
 			lockedImages := strings.Split(*pImageLocked, ",")
-			for _, lockedImage := range lockedImages {
-				imageInspect, err := client.InspectImage(strings.Trim(lockedImage, " "))
-				if err == nil {
-					delete(imageIdMap, imageInspect.ID)
+			images, err := client.ListImages(docker.ListImagesOptions{All: false})
+			if err != nil {
+				log.Println("Img Cleanup: cannot get images list", err)
+				time.Sleep(time.Duration(*pImageCleanInterval+*pImageCleanDelayed) * time.Second)
+				continue
+			}
+			for _, image := range images {
+				for _, repoTag := range image.RepoTags {
+					for _, lockedImage := range lockedImages {
+						lockedImage = strings.TrimSpace(lockedImage)
+						if strings.Contains(lockedImage, ":") {
+							if repoTag == lockedImage {
+								delete(imageIdMap, image.ID)
+							}
+						} else if strings.HasPrefix(repoTag, lockedImage+":") {
+							delete(imageIdMap, image.ID)
+						}
+					}
 				}
-
 			}
 		}
 
